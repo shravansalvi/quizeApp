@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Secure Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/theme.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: radial-gradient(circle at top, #020617, #000);
+            font-family: 'Inter', sans-serif;
+            color: #e5e7eb;
+            user-select: none;
+        }
+
+        .quiz-wrapper {
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .timer {
+            background: rgba(34, 211, 238, 0.15);
+            padding: 8px 14px;
+            border-radius: 6px;
+            border: 1px solid #22d3ee;
+            font-weight: 600;
+            color: #22d3ee;
+        }
+
+        .question-box {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            box-shadow: 0 0 25px rgba(34, 211, 238, 0.12);
+        }
+
+        .question-no {
+            font-size: 14px;
+            color: #9ca3af;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .options label {
+            display: block;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .options input {
+            display: none;
+        }
+
+        .options label:hover {
+            border-color: #22d3ee;
+        }
+
+        .options input:checked+label {
+            background: rgba(34, 211, 238, 0.2);
+            border-color: #22d3ee;
+        }
+
+        .navigation {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .prev {
+            background: #1f2937;
+            color: #e5e7eb;
+        }
+
+        .next {
+            background: linear-gradient(90deg, #22d3ee, #38f9d7);
+            color: #020617;
+        }
+
+        .submit {
+            background: #ef4444;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+<div class="card fade-in">
+
+    <div class="quiz-wrapper">
+
+        <div class="top-bar">
+            <div>🛡️ Secure Exam Mode</div>
+            <div class="timer" id="timer">05:00</div>
+        </div>
+
+        <div class="question-box">
+            <div class="question-no">Question 1 of 10</div>
+            <div class="question-text">
+                Which SQL command is used to retrieve data from a database?
+            </div>
+
+            <div class="options">
+                <input type="radio" name="option" id="opt1">
+                <label for="opt1">INSERT</label>
+
+                <input type="radio" name="option" id="opt2">
+                <label for="opt2">UPDATE</label>
+
+                <input type="radio" name="option" id="opt3">
+                <label for="opt3">SELECT</label>
+
+                <input type="radio" name="option" id="opt4">
+                <label for="opt4">DELETE</label>
+            </div>
+
+            <div class="navigation">
+                <button class="prev">⏮ Previous</button>
+                <button class="next">Next ⏭</button>
+            </div>
+        </div>
+
+        <div style="text-align:right; margin-top:15px;">
+            <button class="submit">Submit Exam</button>
+        </div>
+
+    </div>
+    <script src="assets/js/antiCheat.js"></script>
+    <script src="assets/js/timer.js"></script>
+    <script type="module" src="assets/js/quiz.js"></script>
+    <script>
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAiWIIPynr1ro_J16GKWOKQCIuQ8jAvy6c",
+            authDomain: "quiz-app-c39c3.firebaseapp.com",
+            projectId: "quiz-app-c39c3"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        onAuthStateChanged(auth, user => {
+            if (!user) {
+                window.location.href = "login.html";
+            }
+        });
+        
+    </script>
+    <script src="./assets/js/config.js"></script>
+
+</div>
+</body>
+
+</html>

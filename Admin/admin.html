@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel</title>
+<link rel="stylesheet" href="css/theme.css">
+
+<style>
+body {
+  background:#020617;
+  color:white;
+  font-family:Arial;
+  padding:20px;
+}
+input, button {
+  margin:5px;
+  padding:8px;
+}
+.question {
+  border:1px solid #22d3ee;
+  padding:10px;
+  margin:10px 0;
+}
+</style>
+</head>
+
+<body>
+
+<h2>👑 Admin Panel</h2>
+
+<!-- ADD QUESTION -->
+<h3>Add Question</h3>
+<input id="q" placeholder="Question"><br>
+<input id="o1" placeholder="Option 1"><br>
+<input id="o2" placeholder="Option 2"><br>
+<input id="o3" placeholder="Option 3"><br>
+<input id="o4" placeholder="Option 4"><br>
+<input id="c" placeholder="Correct index (0-3)"><br>
+<button onclick="addQuestion()">Add Question</button>
+
+<hr>
+
+<!-- QUESTION LIST -->
+<h3>All Questions</h3>
+<div id="questionList"></div>
+
+<script type="module">
+/* ---------- IMPORTS ---------- */
+import { ref, push, remove, get } from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+import { onAuthStateChanged } from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import { auth, db } from "./assets/js/firebase.js";
+
+/* ---------- ADMIN CHECK ---------- */
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    alert("Login first");
+    location.href = "login.html";
+    return;
+  }
+
+  const adminSnap = await get(ref(db, "admins/" + user.uid));
+  if (!adminSnap.exists() || adminSnap.val() !== true) {
+    alert("Admin only");
+    location.href = "index.html";
+    return;
+  }
+
+  loadQuestions();
+});
+
+/* ---------- ADD QUESTION ---------- */
+window.addQuestion = async function () {
+  await push(ref(db, "questions"), {
+    question: q.value,
+    options: [o1.value, o2.value, o3.value, o4.value],
+    correct: Number(c.value)
+  });
+  alert("Question added");
+  loadQuestions();
+};
+
+/* ---------- LOAD & DELETE QUESTIONS ---------- */
+async function loadQuestions() {
+  const snap = await get(ref(db, "questions"));
+  const box = document.getElementById("questionList");
+  box.innerHTML = "";
+
+  if (!snap.exists()) return;
+
+  Object.entries(snap.val()).forEach(([id, q]) => {
+    box.innerHTML += `
+      <div class="question">
+        <b>${q.question}</b><br>
+        <button onclick="deleteQuestion('${id}')">❌ Delete</button>
+      </div>`;
+  });
+}
+
+window.deleteQuestion = async function (id) {
+  if (!confirm("Delete this question?")) return;
+  await remove(ref(db, "questions/" + id));
+  loadQuestions();
+};
+</script>
+
+</body>
+</html>

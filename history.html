@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>My Exam History</title>
+<link rel="stylesheet" href="css/theme.css">
+
+<style>
+body {
+  background:#020617;
+  color:white;
+  font-family:Inter, Arial;
+  padding:20px;
+}
+.card {
+  border:1px solid #22d3ee;
+  border-radius:10px;
+  padding:15px;
+  margin:10px 0;
+  animation: fadeUp 0.5s ease;
+}
+@keyframes fadeUp {
+  from {opacity:0; transform:translateY(10px);}
+  to {opacity:1; transform:translateY(0);}
+}
+</style>
+</head>
+<body>
+
+<h2>📊 My Exam History</h2>
+<div id="list"></div>
+
+<script type="module">
+import { ref, get } from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+import { onAuthStateChanged } from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import { auth, db } from "./assets/js/firebase.js";
+
+const list = document.getElementById("list");
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    location.href = "login.html";
+    return;
+  }
+
+  const snap = await get(ref(db, "results/" + user.uid));
+
+  if (!snap.exists()) {
+    list.innerHTML = "<p>No attempts yet.</p>";
+    return;
+  }
+
+  Object.values(snap.val()).reverse().forEach(r => {
+    list.innerHTML += `
+      <div class="card">
+        <b>Score:</b> ${r.score}/${r.total}<br>
+        <b>Violations:</b> ${r.violations}<br>
+        <b>Date:</b> ${new Date(r.time).toLocaleString()}
+      </div>`;
+  });
+});
+</script>
+
+</body>
+</html>
