@@ -1,25 +1,25 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const timeInput = document.getElementById("time");
-  if (!timeInput) return;
+    const timeInput = document.getElementById("time");
+    const timerEl = document.getElementById("timer");
 
-  let time = parseInt(timeInput.value);
-  if (isNaN(time)) return;
+    if (!timeInput || !timerEl) return;
 
-  const timerEl = document.getElementById("timer");
+    let time = parseInt(timeInput.value);
+    if (isNaN(time)) return;
 
-  const interval = setInterval(() => {
-    let min = Math.floor(time / 60);
-    let sec = time % 60;
+    const interval = setInterval(() => {
+        let min = Math.floor(time / 60);
+        let sec = time % 60;
 
-    timerEl.innerText =
-      min + ":" + (sec < 10 ? "0" : "") + sec;
+        timerEl.textContent =
+            min + ":" + (sec < 10 ? "0" : "") + sec;
 
-    time--;
+        time--;
 
-    if (time < 0) {
-      clearInterval(interval);
-      alert("Time Over! Submitting quiz.");
-      document.getElementById("quizForm").submit();
-    }
-  }, 1000);
+        if (time < 0) {
+            clearInterval(interval);
+            alert("Time Over! Submitting quiz.");
+            document.getElementById("quizForm").submit();
+        }
+    }, 1000);
 });

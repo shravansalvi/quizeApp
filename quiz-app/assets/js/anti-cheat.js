@@ -10,19 +10,21 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
-function enterFullscreen() {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen();
-  }
-}
-document.addEventListener("click", enterFullscreen);
+document.addEventListener("DOMContentLoaded", () => {
 
-document.addEventListener("fullscreenchange", () => {
-  if (!document.fullscreenElement) {
-    alert("Fullscreen exited!");
-    document.getElementById("quizForm").submit();
-  }
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+    }
+
+    document.addEventListener("fullscreenchange", () => {
+        if (!document.fullscreenElement) {
+            alert("Fullscreen exited. Quiz will be submitted.");
+            document.getElementById("quizForm")?.submit();
+        }
+    });
+
 });
+
 
 setInterval(() => {
   if (window.outerWidth - window.innerWidth > 200) {

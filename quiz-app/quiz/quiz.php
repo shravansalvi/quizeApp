@@ -1,16 +1,22 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+session_start();
 include("../config/db.php");
 
-if (!isset($_SESSION['quiz_start'])) {
+/* SAFETY */
+if (!isset($_SESSION['questions'], $_SESSION['quiz_start'], $_SESSION['quiz_duration'])) {
     header("Location: ../index.php");
     exit;
 }
 
-$category = $_SESSION['category'];
-$elapsed = time() - $_SESSION['quiz_start'];
+if (!isset($_SESSION['page_loaded'])) {
+    $_SESSION['page_loaded'] = time();
+} else {
+    // allow reload but do NOT reset anything
+}
+
+
+/* TIMER */
+$elapsed   = time() - $_SESSION['quiz_start'];
 $remaining = $_SESSION['quiz_duration'] - $elapsed;
 
 if ($remaining <= 0) {
@@ -18,48 +24,100 @@ if ($remaining <= 0) {
     exit;
 }
 
-$questions = mysqli_query(
-    $conn,
-    "SELECT * FROM questions
-WHERE category='$category'
-ORDER BY RAND()
-LIMIT 15
-"
-);
+/* CURRENT QUESTION */
+$current = isset($_GET['q']) ? (int)$_GET['q'] : 1;
+$index   = $current - 1;
+$total   = count($_SESSION['questions']);
+
+if ($index < 0 || $index >= $total) {
+    header("Location: submit.php");
+    exit;
+}
+
+/* SAVE ANSWER */
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $_SESSION['answers'][$_POST['qid']] = $_POST['ans'] ?? null;
+}
+
+/* FETCH ONE QUESTION */
+$qid = $_SESSION['questions'][$index];
+$res = mysqli_query($conn, "SELECT * FROM questions WHERE id=$qid");
+$q   = mysqli_fetch_assoc($res);
 ?>
 
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz</title>
+</head>
+<body>
+
 <h3>Time Left: <span id="timer"></span></h3>
-<input type="hidden" id="time" value="<?= $remaining ?>">
+<p>Question <?= $current ?> of <?= $total ?></p>
+<?php
+$progress = (($current) / $total) * 100;
+?>
 
-<form id="quizForm" method="post" action="submit.php">
+<div style="width:300px; background:#ddd; height:15px; border-radius:10px;">
+  <div style="
+      width:<?= $progress ?>%;
+      height:100%;
+      background:#4caf50;
+      border-radius:10px;">
+  </div>
+</div>
 
-<?php $i = 1; while ($q = mysqli_fetch_assoc($questions)) { ?>
-    <p><b><?= $i ?>. <?= $q['question'] ?></b></p>
+<p><?= $current ?> / <?= $total ?> completed</p>
+
+<form id="quizForm" method="post" action="quiz.php?q=<?= $current + 1 ?>">
+    <input type="hidden" name="qid" value="<?= $qid ?>">
+
+    <p><b><?= $q['question'] ?></b></p>
 
     <label>
-      <input type="radio" name="ans[<?= $q['id'] ?>]" value="A">
-      <?= $q['option_a'] ?>
+        <input type="radio" name="ans" value="A"
+        <?= ($_SESSION['answers'][$qid] ?? '') === 'A' ? 'checked' : '' ?>>
+        <?= $q['option_a'] ?>
     </label><br>
 
     <label>
-      <input type="radio" name="ans[<?= $q['id'] ?>]" value="B">
-      <?= $q['option_b'] ?>
+        <input type="radio" name="ans" value="B"
+        <?= ($_SESSION['answers'][$qid] ?? '') === 'B' ? 'checked' : '' ?>>
+        <?= $q['option_b'] ?>
     </label><br>
 
     <label>
-      <input type="radio" name="ans[<?= $q['id'] ?>]" value="C">
-      <?= $q['option_c'] ?>
+        <input type="radio" name="ans" value="C"
+        <?= ($_SESSION['answers'][$qid] ?? '') === 'C' ? 'checked' : '' ?>>
+        <?= $q['option_c'] ?>
     </label><br>
 
     <label>
-      <input type="radio" name="ans[<?= $q['id'] ?>]" value="D">
-      <?= $q['option_d'] ?>
+        <input type="radio" name="ans" value="D"
+        <?= ($_SESSION['answers'][$qid] ?? '') === 'D' ? 'checked' : '' ?>>
+        <?= $q['option_d'] ?>
     </label><br><br>
 
-<?php $i++; } ?>
+    <?php if ($current > 1) { ?>
+    <form id="quizForm" method="post" action="quiz.php?q=<?= $current + 1 ?>">
+    <input type="hidden" id="manualSubmit" value="0">
 
-<button type="submit">Submit Quiz</button>
+        <button type="button">Previous</button>
+    </a>
+<?php } ?>
+
+<?php if ($current == $total) { ?>
+    <button type="submit">Submit</button>
+<?php } else { ?>
+    <button type="submit">Next</button>
+<?php } ?>
+
 </form>
+
+<input type="hidden" id="time" value="<?= $remaining ?>">
 
 <script src="../assets/js/quiz.js"></script>
 <script src="../assets/js/anti-cheat.js"></script>
+
+</body>
+</html>
