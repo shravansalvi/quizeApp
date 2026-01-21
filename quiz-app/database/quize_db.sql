@@ -6,16 +6,19 @@ CREATE TABLE users (
 );
 
 
-
 CREATE TABLE questions (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  question TEXT,
-  option_a VARCHAR(255),
-  option_b VARCHAR(255),
-  option_c VARCHAR(255),
-  option_d VARCHAR(255),
-  correct_option CHAR(1)
+  question TEXT NOT NULL,
+  option_a VARCHAR(255) NOT NULL,
+  option_b VARCHAR(255) NOT NULL,
+  option_c VARCHAR(255) NOT NULL,
+  option_d VARCHAR(255) NOT NULL,
+  correct_option CHAR(1) NOT NULL,
+  category VARCHAR(50) DEFAULT 'SQL'
 );
+
+-- ALTER TABLE questions if want to add explictly // ADD category VARCHAR(50) DEFAULT 'SQL';
+
 
 
 CREATE TABLE results (

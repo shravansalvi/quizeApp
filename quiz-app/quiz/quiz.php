@@ -20,7 +20,11 @@ if ($remaining <= 0) {
 
 $questions = mysqli_query(
     $conn,
-    "SELECT * FROM questions WHERE category='$category' ORDER BY RAND()"
+    "SELECT * FROM questions
+WHERE category='$category'
+ORDER BY RAND()
+LIMIT 15
+"
 );
 ?>
 
