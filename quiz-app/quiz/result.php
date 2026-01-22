@@ -6,6 +6,9 @@ if (!isset($_SESSION['score'], $_SESSION['total_questions'])) {
     exit;
 }
 
+echo $_SESSION['team_a'];
+echo $_SESSION['team_b'];
+
 $score = $_SESSION['score'];
 $total = $_SESSION['total_questions'];
 

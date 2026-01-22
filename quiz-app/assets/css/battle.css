@@ -1,0 +1,155 @@
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f2f2f2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.outer {
+    width: 900px;
+    border: 2px solid #333;
+    border-radius: 20px;
+    padding: 20px;
+    background: #fff;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.quiz-box {
+    border: 2px solid #333;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.question-box {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#timer {
+    margin-top: 8px;
+    font-weight: bold;
+}
+
+.options-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.team {
+    border: 1px solid #aaa;
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+}
+
+.option {
+    display: block;
+    width: 100%;
+    margin: 8px 0;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #333;
+    background: #fff;
+    cursor: pointer;
+}
+
+.footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.team-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.score {
+    border: 1px solid #333;
+    padding: 5px 12px;
+    border-radius: 50%;
+}
+
+.question-no {
+    font-weight: bold;
+}
+
+.result-area {
+    text-align: center;
+    margin-top: 20px;
+}
+
+
+body {
+    font-family: Arial;
+    background: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.outer {
+    width: 900px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+}
+
+.quiz-box {
+    text-align: center;
+}
+
+.options {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+}
+
+.team {
+    width: 45%;
+}
+
+.opt {
+    display: block;
+    width: 100%;
+    margin: 6px 0;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.next-question {
+    margin-top: 15px;
+    padding: 10px 20px;
+    border: 2px dashed #333;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.next-question:hover {
+    background: #333;
+    color: #fff;
+}

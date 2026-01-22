@@ -12,6 +12,9 @@ if (!isset($_SESSION['answers'])) {
     $_SESSION['answers'] = [];
 }
 
+echo $_SESSION['team_a'];
+echo $_SESSION['team_b'];
+
 
 if (!isset($_SESSION['page_loaded'])) {
     $_SESSION['page_loaded'] = time();
