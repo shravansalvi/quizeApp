@@ -2,17 +2,26 @@
 session_start();
 include("../config/db.php");
 
-/* STOP AFTER 15 QUESTIONS */
 if (!isset($_SESSION['question_count'])) {
     $_SESSION['question_count'] = 0;
 }
 
-if ($_SESSION['question_count'] >= 15) {
+/* 🔥 NORMAL ROUND = 15 QUESTIONS
+   🔥 TIE-BREAKER = 1 QUESTION ONLY */
+if (!empty($_SESSION['tie_breaker'])) {
+    if ($_SESSION['question_count'] >= 1) {
+        echo json_encode(["end" => true]);
+        exit;
+    }
+} else{
+    if (empty($_SESSION['tie_breaker']) && $_SESSION['question_count'] >= 15) {
+    $_SESSION['normal_round_over'] = true;   // ✅ MARK NORMAL ROUND DONE
     echo json_encode(["end" => true]);
     exit;
 }
+}
 
-/* FETCH ONLY SQL QUESTIONS */
+/* FETCH SQL QUESTION */
 $sql = "
     SELECT id, question, option_a, option_b, option_c, option_d, correct_option
     FROM questions
@@ -28,7 +37,7 @@ if (!$res || mysqli_num_rows($res) === 0) {
     exit;
 }
 
-/* INCREMENT QUESTION COUNT */
+/* INCREMENT COUNT */
 $_SESSION['question_count']++;
 
 $q = mysqli_fetch_assoc($res);

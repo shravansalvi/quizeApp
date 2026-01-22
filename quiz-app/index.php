@@ -4,19 +4,26 @@ session_start();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['start'])) {
+
+        unset(
+            $_SESSION['question_count'],
+            $_SESSION['result_log'],
+            $_SESSION['scoreA'],
+            $_SESSION['scoreB'],
+            $_SESSION['tie_breaker'],
+            $_SESSION['normal_round_over']
+        );
+
         $_SESSION['team_a'] = $_POST['team_a'];
         $_SESSION['team_b'] = $_POST['team_b'];
 
         header("Location: battle/battle.php");
         exit;
     }
-
-    if (isset($_POST['result'])) {
-        header("Location: battle/result.php");
-        exit;
-    }
 }
 ?>
+
+
 
 <!DOCTYPE html>
 <html>
