@@ -1,20 +1,20 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['result'])) {
-    header("Location: ../index.php");
+if (!isset($_SESSION['score'], $_SESSION['total_questions'])) {
+    echo "No result found. Please attempt quiz again.";
     exit;
 }
 
-$score = $_SESSION['result']['score'];
-$total = $_SESSION['result']['total'];
-$time  = $_SESSION['result']['time'];
+$score = $_SESSION['score'];
+$total = $_SESSION['total_questions'];
 
-$minutes = floor($time / 60);
-$seconds = $time % 60;
+if ($total <= 0) {
+    echo "Invalid result data.";
+    exit;
+}
 
-/* prevent refresh resubmit */
-unset($_SESSION['result']);
+$percent = round(($score / $total) * 100, 2);
 ?>
 
 <!DOCTYPE html>
@@ -24,12 +24,13 @@ unset($_SESSION['result']);
 </head>
 <body>
 
-<h2>Quiz Completed ✅</h2>
+<h2>Quiz Result</h2>
 
-<p><b>Score:</b> <?= $score ?> / <?= $total ?></p>
-<p><b>Time Taken:</b> <?= $minutes ?> min <?= $seconds ?> sec</p>
+<p><strong>Score:</strong> <?= $score ?> / <?= $total ?></p>
+<p><strong>Percentage:</strong> <?= $percent ?>%</p>
 
-<a href="../index.php">Start New Quiz</a>
-
-</body>
-</html>
+<?php if ($percent >= 40): ?>
+    <h3 style="color:green;">PASS 🎉</h3>
+<?php else: ?>
+    <h3 style="color:red;">FAIL ❌</h3>
+<?php endif;

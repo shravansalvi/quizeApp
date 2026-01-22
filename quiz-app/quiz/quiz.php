@@ -8,6 +8,11 @@ if (!isset($_SESSION['questions'], $_SESSION['quiz_start'], $_SESSION['quiz_dura
     exit;
 }
 
+if (!isset($_SESSION['answers'])) {
+    $_SESSION['answers'] = [];
+}
+
+
 if (!isset($_SESSION['page_loaded'])) {
     $_SESSION['page_loaded'] = time();
 } else {
@@ -68,7 +73,6 @@ $progress = (($current) / $total) * 100;
 </div>
 
 <p><?= $current ?> / <?= $total ?> completed</p>
-
 <form id="quizForm" method="post" action="quiz.php?q=<?= $current + 1 ?>">
     <input type="hidden" name="qid" value="<?= $qid ?>">
 
@@ -98,16 +102,14 @@ $progress = (($current) / $total) * 100;
         <?= $q['option_d'] ?>
     </label><br><br>
 
-    <?php if ($current > 1) { ?>
-    <form id="quizForm" method="post" action="quiz.php?q=<?= $current + 1 ?>">
-    <input type="hidden" id="manualSubmit" value="0">
+   <!-- BUTTONS -->
 
-        <button type="button">Previous</button>
-    </a>
+<?php if ($current > 1) { ?>
+    <button type="submit" formaction="quiz.php?q=<?= $current - 1 ?>">Previous</button>
 <?php } ?>
 
 <?php if ($current == $total) { ?>
-    <button type="submit">Submit</button>
+    <button type="submit" formaction="submit.php">Submit</button>
 <?php } else { ?>
     <button type="submit">Next</button>
 <?php } ?>

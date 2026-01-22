@@ -1,34 +1,58 @@
-document.addEventListener("contextmenu", e => e.preventDefault());
-document.addEventListener("copy", e => e.preventDefault());
-document.addEventListener("paste", e => e.preventDefault());
-document.addEventListener("selectstart", e => e.preventDefault());
+let quizStarted = false;
+let submitted = false;
+let visibilityTriggered = false;
 
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    alert("Cheating detected!");
-    document.getElementById("quizForm").submit();
-  }
+/* Disable basic actions */
+["contextmenu", "copy", "paste", "selectstart"].forEach(evt => {
+    document.addEventListener(evt, e => e.preventDefault());
 });
 
-document.addEventListener("DOMContentLoaded", () => {
+/* Start protection AFTER page load */
+window.addEventListener("load", () => {
+    setTimeout(() => {
+        quizStarted = true;
+    }, 1500); // allow page settle
+});
+
+/* Visibility change (TAB SWITCH) */
+document.addEventListener("visibilitychange", () => {
+    if (!quizStarted || submitted) return;
+
+    if (document.hidden && !visibilityTriggered) {
+        visibilityTriggered = true;
+        autoSubmit("Tab switching detected!");
+    }
+});
+
+/* Fullscreen enforcement (USER MUST ENTER FULLSCREEN) */
+document.addEventListener("fullscreenchange", () => {
+    if (!quizStarted || submitted) return;
 
     if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {});
+        autoSubmit("Fullscreen exited!");
     }
-
-    document.addEventListener("fullscreenchange", () => {
-        if (!document.fullscreenElement) {
-            alert("Fullscreen exited. Quiz will be submitted.");
-            document.getElementById("quizForm")?.submit();
-        }
-    });
-
 });
 
-
+/* DevTools detection (SAFE VERSION) */
 setInterval(() => {
-  if (window.outerWidth - window.innerWidth > 200) {
-    alert("DevTools detected!");
-    document.getElementById("quizForm").submit();
-  }
-}, 1000);
+    if (!quizStarted || submitted) return;
+
+    const threshold = 300;
+    if (
+        Math.abs(window.outerWidth - window.innerWidth) > threshold ||
+        Math.abs(window.outerHeight - window.innerHeight) > threshold
+    ) {
+        autoSubmit("DevTools detected!");
+    }
+}, 2000);
+
+/* Auto submit function */
+function autoSubmit(reason) {
+    if (submitted) return;
+    submitted = true;
+
+    alert(reason + " Quiz will be submitted.");
+
+    const form = document.getElementById("quizForm");
+    if (form) form.submit();
+}
