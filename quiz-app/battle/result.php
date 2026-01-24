@@ -1,154 +1,136 @@
 <?php
-session_start();
+// -------------------------------
+// SAMPLE RESULT ARRAY
+// (Replace this with $_SESSION['results'] if needed)
+// -------------------------------
+$results = [
+    ['q'=>1,'teamA_correct'=>'','teamB_correct'=>'','teamA_time'=>0,'teamB_time'=>0],
+    ['q'=>2,'teamA_correct'=>'','teamB_correct'=>'','teamA_time'=>0,'teamB_time'=>0],
+    ['q'=>3,'teamA_correct'=>'','teamB_correct'=>'','teamA_time'=>0,'teamB_time'=>0],
+    ['q'=>4,'teamA_correct'=>'','teamB_correct'=>'','teamA_time'=>0,'teamB_time'=>0],
+    ['q'=>5,'teamA_correct'=>'','teamB_correct'=>'','teamA_time'=>0,'teamB_time'=>0],
+    ['q'=>6,'teamA_correct'=>1,'teamB_correct'=>1,'teamA_time'=>4,'teamB_time'=>5],
+    ['q'=>7,'teamA_correct'=>'','teamB_correct'=>1,'teamA_time'=>0,'teamB_time'=>3],
+    ['q'=>8,'teamA_correct'=>'','teamB_correct'=>1,'teamA_time'=>0,'teamB_time'=>4],
+    ['q'=>9,'teamA_correct'=>1,'teamB_correct'=>1,'teamA_time'=>5,'teamB_time'=>6],
+    ['q'=>10,'teamA_correct'=>1,'teamB_correct'=>1,'teamA_time'=>3,'teamB_time'=>4],
+    ['q'=>11,'teamA_correct'=>'','teamB_correct'=>1,'teamA_time'=>0,'teamB_time'=>3],
+    ['q'=>12,'teamA_correct'=>1,'teamB_correct'=>1,'teamA_time'=>1,'teamB_time'=>2],
+    ['q'=>13,'teamA_correct'=>1,'teamB_correct'=>1,'teamA_time'=>3,'teamB_time'=>4],
+    ['q'=>14,'teamA_correct'=>1,'teamB_correct'=>1,'teamA_time'=>2,'teamB_time'=>3],
+    ['q'=>15,'teamA_correct'=>1,'teamB_correct'=>1,'teamA_time'=>4,'teamB_time'=>5],
+];
 
-$resultLog = $_SESSION['result_log'] ?? [];
-
-
-if (empty($resultLog)) {
-    echo "<h2>No result data available.</h2>";
-    echo "<a href='../index.php'>Start Quiz</a>";
-    exit;
-}
-
-
-
-$teamA = $_SESSION['team_a'];
-$teamB = $_SESSION['team_b'];
-
-$totalA = 0;
-$totalB = 0;
-$timeA  = 0;
-$timeB  = 0;
-
-/* Calculate totals */
-foreach ($resultLog as $row) {
-    if ($row['teamA_correct']) {
-        $totalA++;
-        $timeA += $row['teamA_time'];
-    }
-    if ($row['teamB_correct']) {
-        $totalB++;
-        $timeB += $row['teamB_time'];
-    }
-}
-
-/* Decide winner */
-if ($totalA > $totalB) {
-    $winner = $teamA;
-} elseif ($totalB > $totalA) {
-    $winner = $teamB;
-} else {
-    $winner = ($timeA < $timeB) ? $teamA : $teamB;
-}
-
-echo "<pre>";
-print_r($_SESSION['result_log']);
-exit;
-
+// -------------------------------
+// TOTALS
+// -------------------------------
+$teamA_score = 0;
+$teamB_score = 0;
+$teamA_time  = 0;
+$teamB_time  = 0;
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
-<title>Final Result</title>
-<style>
-body {
-    font-family: Arial;
-    background: #f2f2f2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
-.outer {
-    width: 900px;
-    background: #fff;
-    padding: 20px;
-    border-radius: 20px;
-}
-.header {
-    display: flex;
-    justify-content: space-between;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-.inner {
-    border: 2px solid #333;
-    border-radius: 15px;
-    padding: 15px;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-}
-th, td {
-    border: 1px solid #aaa;
-    padding: 8px;
-    text-align: center;
-}
-th {
-    background: #eee;
-}
-.winner-box {
-    display: flex;
-    justify-content: space-around;
-    border-top: 2px solid #333;
-    padding-top: 15px;
-}
-.winner-box div {
-    padding: 10px 20px;
-    border: 1px solid #333;
-    border-radius: 10px;
-}
-</style>
+    <title>Quiz Result</title>
+    <style>
+        body { font-family: Arial; background:#f4f6f8; padding:20px; }
+        table { border-collapse: collapse; width:100%; background:#fff; }
+        th, td { border:1px solid #ccc; padding:10px; text-align:center; }
+        th { background:#222; color:#fff; }
+        .win { color:green; font-weight:bold; }
+        .lose { color:red; }
+        .tie { color:orange; font-weight:bold; }
+        h2, h3 { margin-top:20px; }
+    </style>
 </head>
 <body>
 
-<div class="outer">
-    <div class="header">
-        <span>TECH HEAD</span>
-        <span>IT FEST_2025-26</span>
-    </div>
+<h2>🏁 Quiz Result Table</h2>
 
-    <div class="inner">
-        <h3>Result</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Question</th>
+            <th>Team A</th>
+            <th>Team B</th>
+            <th>Winner</th>
+        </tr>
+    </thead>
+    <tbody>
 
-        <table>
-    <tr>
-        <th>No. of Question</th>
-        <th><?= htmlspecialchars($teamA) ?> Points</th>
-        <th><?= htmlspecialchars($teamB) ?> Points</th>
-    </tr>
+<?php foreach ($results as $row): ?>
 
-    <?php foreach ($resultLog as $row): ?>
-    <tr>
-        <td>Q<?= $row['q'] ?></td>
-        <td><?= $row['teamA_correct'] ? 1 : 0 ?></td>
-        <td><?= $row['teamB_correct'] ? 1 : 0 ?></td>
-    </tr>
-    <?php endforeach; ?>
+<?php
+$q = $row['q'];
+
+$aCorrect = (int)$row['teamA_correct'];
+$bCorrect = (int)$row['teamB_correct'];
+
+$aTime = (int)$row['teamA_time'];
+$bTime = (int)$row['teamB_time'];
+
+$winner = "—";
+$class  = "";
+
+/* DECISION LOGIC */
+if ($aCorrect && $bCorrect) {
+    if ($aTime < $bTime) {
+        $teamA_score++;
+        $winner = "Team A (Faster)";
+        $class = "win";
+    } elseif ($bTime < $aTime) {
+        $teamB_score++;
+        $winner = "Team B (Faster)";
+        $class = "win";
+    } else {
+        $winner = "Tie";
+        $class = "tie";
+    }
+} elseif ($aCorrect) {
+    $teamA_score++;
+    $winner = "Team A";
+    $class = "win";
+} elseif ($bCorrect) {
+    $teamB_score++;
+    $winner = "Team B";
+    $class = "win";
+}
+
+$teamA_time += $aTime;
+$teamB_time += $bTime;
+?>
+
+<tr>
+    <td><?= $q ?></td>
+    <td><?= $aCorrect ? "✔ {$aTime}s" : "✖" ?></td>
+    <td><?= $bCorrect ? "✔ {$bTime}s" : "✖" ?></td>
+    <td class="<?= $class ?>"><?= $winner ?></td>
+</tr>
+
+<?php endforeach; ?>
+
+    </tbody>
 </table>
 
+<h3>📊 Final Summary</h3>
 
-        <div class="winner-box">
-    <div>
-        <b>Winner</b><br>
-        <?= htmlspecialchars($winner) ?>
-    </div>
+<p><strong>Team A Score:</strong> <?= $teamA_score ?></p>
+<p><strong>Team B Score:</strong> <?= $teamB_score ?></p>
 
-    <div>
-        <b>Points Gained</b><br>
-        <?= $winner === "DRAW" ? "-" : ($winner === $teamA ? $totalA : $totalB) ?>
-    </div>
+<p><strong>Total Time Team A:</strong> <?= $teamA_time ?> sec</p>
+<p><strong>Total Time Team B:</strong> <?= $teamB_time ?> sec</p>
 
-    <div>
-        <b>Total Time Taken</b><br>
-        <?= $winner === "DRAW" ? "-" : (($winner === $teamA ? $timeA : $timeB) . " sec") ?>
-    </div>
-</div>
-
-    </div>
-</div>
+<?php
+if ($teamA_score > $teamB_score) {
+    echo "<h2 class='win'>🏆 Team A Wins the Match!</h2>";
+} elseif ($teamB_score > $teamA_score) {
+    echo "<h2 class='win'>🏆 Team B Wins the Match!</h2>";
+} else {
+    echo "<h2 class='tie'>🤝 Match Draw</h2>";
+}
+?>
 
 </body>
 </html>
