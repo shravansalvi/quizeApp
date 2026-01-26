@@ -10,8 +10,6 @@ Normal round (15 questions)
 
 Automatic result evaluation
 
-Tie-breaker (Sudden Death – 1 question)
-
 Accurate per-question logging
 
 Time-based tie resolution
